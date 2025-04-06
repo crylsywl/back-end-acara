@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import * as Yup from "yup";
 import UserModel from "../models/user.models";
+import { encrypt } from "../utils/encryption";
+import { generateToken } from "../utils/jwt";
+import { IReqUser } from "../middlewares/auth.middleware";
 
 type TRegister = {
   fullName: string;
@@ -8,6 +11,11 @@ type TRegister = {
   email: string;
   password: string;
   confirmPassword: string;
+};
+
+type TLogin = {
+  identifier: string;
+  password: string;
 };
 
 const registerValidateSchema = Yup.object({
@@ -53,4 +61,82 @@ export default {
       });
     }
   },
+
+  async login(req: Request, res: Response) {
+    try {
+      const {
+        identifier,
+        password
+      }  = req.body as unknown as TLogin;
+      const userByIdentyfier = await UserModel.findOne({
+        $or: [
+          { 
+            username: identifier 
+          }, 
+          { 
+            email: identifier 
+          }
+        ],
+      });
+
+      if (!userByIdentyfier) {
+        return res.status(403).json({
+          message: "User not found",
+          data: null,
+        });
+      }
+
+      const validatePassword: boolean = 
+      encrypt(password) === userByIdentyfier.password;
+       
+
+      if (!validatePassword) {
+        return res.status(403).json({
+          message: "Invalid password",
+          data: null,
+        });
+      }
+
+
+      const token = generateToken({
+        id : userByIdentyfier._id,
+        role: userByIdentyfier.role,
+      });
+
+
+      res.status(200).json({
+        message: "Success login",
+        data: token,
+      });
+
+    }
+    catch (error) {
+      const err = error as unknown as Error;
+      res.status(400).json({
+        message: err.message,
+        data: null,
+      });
+    }
+  },
+
+  async me(req: IReqUser, res: Response) {
+    try {
+      const user = req.user;
+      const result = await UserModel.findById(user?.id);
+
+      res.status(200).json({
+        message: "Success get user profile",
+        data: result,
+      });
+    } catch (error) {
+      const err = error as unknown as Error;
+      res.status(400).json({
+        message: err.message,
+        data: null,
+      });
+    }
+    },
+  
+
+
 };
