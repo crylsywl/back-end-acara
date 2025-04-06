@@ -63,19 +63,25 @@ export default {
   },
 
   async login(req: Request, res: Response) {
+    /**
+     #swagger.requestBody = {
+       required: true,
+       schema: {
+         $ref: "#/components/schemas/loginRequest"
+       }
+     }
+     */
+
     try {
-      const {
-        identifier,
-        password
-      }  = req.body as unknown as TLogin;
+      const { identifier, password } = req.body as unknown as TLogin;
       const userByIdentyfier = await UserModel.findOne({
         $or: [
-          { 
-            username: identifier 
-          }, 
-          { 
-            email: identifier 
-          }
+          {
+            username: identifier,
+          },
+          {
+            email: identifier,
+          },
         ],
       });
 
@@ -86,9 +92,8 @@ export default {
         });
       }
 
-      const validatePassword: boolean = 
-      encrypt(password) === userByIdentyfier.password;
-       
+      const validatePassword: boolean =
+        encrypt(password) === userByIdentyfier.password;
 
       if (!validatePassword) {
         return res.status(403).json({
@@ -97,20 +102,16 @@ export default {
         });
       }
 
-
       const token = generateToken({
-        id : userByIdentyfier._id,
+        id: userByIdentyfier._id,
         role: userByIdentyfier.role,
       });
-
 
       res.status(200).json({
         message: "Success login",
         data: token,
       });
-
-    }
-    catch (error) {
+    } catch (error) {
       const err = error as unknown as Error;
       res.status(400).json({
         message: err.message,
@@ -120,6 +121,11 @@ export default {
   },
 
   async me(req: IReqUser, res: Response) {
+    /**
+     #swagger.security = [{
+       "baererAuth": []
+     }]
+     */
     try {
       const user = req.user;
       const result = await UserModel.findById(user?.id);
@@ -135,8 +141,5 @@ export default {
         data: null,
       });
     }
-    },
-  
-
-
+  },
 };
