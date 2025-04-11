@@ -27,7 +27,7 @@ const doc = {
     schemas: {
       loginRequest: {
         identifier: "crylsywl",
-        password: "13orangminus",
+        password: "admin123",
       },
     },
   },
