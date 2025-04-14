@@ -22,7 +22,27 @@ const registerValidateSchema = Yup.object({
   fullName: Yup.string().required(),
   username: Yup.string().required(),
   email: Yup.string().required(),
-  password: Yup.string().required(),
+  password: Yup.string()
+    .required()
+    .min(6, "Password must be at least 6 characters")
+    .test(
+      "at-least-one-uppercase",
+      "contain at least one uppercase letter",
+      (value) => {
+        if (!value) return false;
+        const regex = /^(?=.*[A-Z])/;
+        return regex.test(value);
+      }
+    )
+    .test(
+      "at-least-one-number",
+      "contain at least one number letter",
+      (value) => {
+        if (!value) return false;
+        const regex = /^(?=.*\d)/;
+        return regex.test(value);
+      }
+    ),
   confirmPassword: Yup.string()
     .required()
     .oneOf([Yup.ref("password"), ""], "Passwords must match"),
@@ -30,6 +50,9 @@ const registerValidateSchema = Yup.object({
 
 export default {
   async register(req: Request, res: Response) {
+    /**
+     #swagger.tags = ['Auth']
+    */     
     const { fullName, username, email, password, confirmPassword } =
       req.body as unknown as TRegister;
 
@@ -64,6 +87,7 @@ export default {
 
   async login(req: Request, res: Response) {
     /**
+     #swagger.tags = ['Auth']
      #swagger.requestBody = {
        required: true,
        schema: {
@@ -83,6 +107,7 @@ export default {
             email: identifier,
           },
         ],
+        isActive: true,
       });
 
       if (!userByIdentyfier) {
@@ -122,6 +147,7 @@ export default {
 
   async me(req: IReqUser, res: Response) {
     /**
+     #swagger.tags = ['Auth']
      #swagger.security = [{
        "baererAuth": []
      }]
@@ -133,6 +159,44 @@ export default {
       res.status(200).json({
         message: "Success get user profile",
         data: result,
+      });
+    } catch (error) {
+      const err = error as unknown as Error;
+      res.status(400).json({
+        message: err.message,
+        data: null,
+      });
+    }
+  },
+  async activation(req: Request, res: Response) {
+   
+    /**
+     #swagger.tags = ['Auth']
+     #swagger.requestBody = {
+       required: true,
+       schema: {
+         $ref: "#/components/schemas/ActivationRequest"
+       }
+     }
+     */
+    try {
+      const { code } = req.body as { code: string };
+
+      const user = await UserModel.findOneAndUpdate(
+        {
+          activationCode: code,
+        },
+        {
+          isActive: true,
+        },
+        {
+          new: true,
+        }
+      );
+
+      res.status(200).json({
+        message: "user successfully activated",
+        data: user,
       });
     } catch (error) {
       const err = error as unknown as Error;

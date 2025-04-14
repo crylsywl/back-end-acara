@@ -29,6 +29,9 @@ const doc = {
         identifier: "crylsywl",
         password: "admin123",
       },
+      ActivationRequest: {
+        code: "abcdef",
+      },
     },
   },
 };
