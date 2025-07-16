@@ -23,7 +23,7 @@ async function init() {
 
     app.get("/", (req, res) => {
       res.status(200).json({
-        message: "Server is running, use /api-docs to view the API documentation.",
+        message: "Server is running, use /api-docs to view the API documentation, thanks.",
         data: null,
       });
     });
