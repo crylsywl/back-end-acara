@@ -132,9 +132,17 @@ export default {
         role: userByIdentyfier.role,
       });
 
+      // res.status(200).json({
+      //   message: "Success login",
+      //   data: token,
+      // });
       res.status(200).json({
-        message: "Success login",
-        data: token,
+        token, // Token di root level
+      user: {
+        _id: userByIdentyfier._id,
+        role: userByIdentyfier.role,
+        email: userByIdentyfier.email
+      }
       });
     } catch (error) {
       const err = error as unknown as Error;
