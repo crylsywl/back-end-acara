@@ -3,7 +3,8 @@ import * as Yup from "yup";
 import UserModel from "../models/user.models";
 import { encrypt } from "../utils/encryption";
 import { generateToken } from "../utils/jwt";
-import { IReqUser } from "../middlewares/auth.middleware";
+import { IReqUser } from "../utils/interface";
+import response from "../utils/response";
 
 type TRegister = {
   fullName: string;
@@ -52,7 +53,7 @@ export default {
   async register(req: Request, res: Response) {
     /**
      #swagger.tags = ['Auth']
-    */     
+    */
     const { fullName, username, email, password, confirmPassword } =
       req.body as unknown as TRegister;
 
@@ -71,17 +72,9 @@ export default {
         email,
         password,
       });
-
-      res.status(200).json({
-        message: "Success registration",
-        data: result,
-      });
+      response.succes(res, result,"Success Registration")
     } catch (error) {
-      const err = error as unknown as Error;
-      res.status(400).json({
-        message: err.message,
-        data: null,
-      });
+      response.error(res, error, 'failed registration')
     }
   },
 
@@ -111,20 +104,15 @@ export default {
       });
 
       if (!userByIdentyfier) {
-        return res.status(403).json({
-          message: "User not found",
-          data: null,
-        });
+        return response.unauthorize(res, 'user not found');
+        
       }
 
       const validatePassword: boolean =
         encrypt(password) === userByIdentyfier.password;
 
       if (!validatePassword) {
-        return res.status(403).json({
-          message: "Invalid password",
-          data: null,
-        });
+        return response.unauthorize(res, 'Invalid password')
       }
 
       const token = generateToken({
@@ -138,11 +126,11 @@ export default {
       // });
       res.status(200).json({
         token, // Token di root level
-      user: {
-        _id: userByIdentyfier._id,
-        role: userByIdentyfier.role,
-        email: userByIdentyfier.email
-      }
+        user: {
+          _id: userByIdentyfier._id,
+          role: userByIdentyfier.role,
+          email: userByIdentyfier.email,
+        },
       });
     } catch (error) {
       const err = error as unknown as Error;
@@ -150,6 +138,7 @@ export default {
         message: err.message,
         data: null,
       });
+      response.error(res, error, 'login failed')
     }
   },
 
@@ -177,7 +166,6 @@ export default {
     }
   },
   async activation(req: Request, res: Response) {
-   
     /**
      #swagger.tags = ['Auth']
      #swagger.requestBody = {
