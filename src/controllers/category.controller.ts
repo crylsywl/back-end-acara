@@ -9,7 +9,6 @@ export default {
       await categoryDAO.validate(req.body);
       const result = await CategoryModel.create(req.body);
       response.succes(res, result, "Success created category");
-      console.log(result)
     } catch (error) {
       response.error(res, error, "failed created a category");
     }
@@ -43,42 +42,47 @@ export default {
         .sort({ createAt: -1 })
         .exec();
 
-        console.log(result)
+      const count = await CategoryModel.countDocuments(query);
 
-      const count = await CategoryModel.countDocuments(query)
-
-      response.pagination(res, result, {
-        total: count,
-        totalPages: Math.ceil(count/limit),
-        current: page
-      }, 'Success find all category')
+      response.pagination(
+        res,
+        result,
+        {
+          total: count,
+          totalPages: Math.ceil(count / limit),
+          current: page,
+        },
+        "Success find all category"
+      );
     } catch (error) {
       response.error(res, error, "failed find all category");
     }
   },
   async findOne(req: IReqUser, res: Response) {
     try {
-        const { id } = req.params
-        const result = await CategoryModel.findById(id)
-        response.succes(res, result, 'Success find one category')
+      const { id } = req.params;
+      const result = await CategoryModel.findById(id);
+      response.succes(res, result, "Success find one category");
     } catch (error) {
       response.error(res, error, "failed find one a category");
     }
   },
   async update(req: IReqUser, res: Response) {
     try {
-        const { id } = req.params
-        const result = await CategoryModel.findByIdAndUpdate(id, req.body, { new: true})
-        response.succes(res, result, 'success update category')
+      const { id } = req.params;
+      const result = await CategoryModel.findByIdAndUpdate(id, req.body, {
+        new: true,
+      });
+      response.succes(res, result, "success update category");
     } catch (error) {
       response.error(res, error, "failed update a category");
     }
   },
   async remove(req: IReqUser, res: Response) {
     try {
-        const { id } = req.params
-        const result = await CategoryModel.findByIdAndDelete(id)
-        response.succes(res, result, 'success remove category')
+      const { id } = req.params;
+      const result = await CategoryModel.findByIdAndDelete(id);
+      response.succes(res, result, "success remove category");
     } catch (error) {
       response.error(res, error, "failed remove a category");
     }

@@ -17,6 +17,176 @@ router.get("/auth/me", authMiddleware, authController.me);
 router.post("/auth/activation", authController.activation);
 
 router.post(
+  "/category",
+  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+  categoryController.create
+  /*
+  #swagger.tags = ['Category']
+  #swagger.security = [{
+    "baererAuth": []
+  }]
+  #swagger.requestBody = {
+    required: true,
+    schema: {
+      $ref: "#/components/schemas/CreateCategoryRequest"
+    }
+  }
+  */
+);
+router.get(
+  "/category",
+  categoryController.findAll
+  /*
+  #swagger.tags = ['Category']
+  */
+);
+router.get(
+  "/category/:id",
+  categoryController.findOne
+  /*
+  #swagger.tags = ['Category']
+  */
+);
+router.put(
+  "/category/:id",
+  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+  categoryController.update
+  /*
+  #swagger.tags = ['Category']
+  #swagger.security = [{
+    "baererAuth": {}
+  }]
+  #swagger.requestBody = {
+    required: true,
+    schema: {
+      $ref: "#/components/schemas/CreateCategoryRequest"
+    }
+  }
+  */
+);
+router.delete(
+  "/category/:id",
+  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+  categoryController.remove
+  /*
+  #swagger.tags = ['Category']
+  #swagger.security = [{
+    "baererAuth": {}
+  }]
+  */
+);
+
+router.get(
+  "/regions",
+  regionController.getAllProvinces
+  /*
+  #swagger.tags = ['Regions']
+  */
+);
+router.get(
+  "/regions/:id/province",
+  regionController.getProvince
+  /*
+  #swagger.tags = ['Regions']
+  */
+);
+router.get(
+  "/regions/:id/regency",
+  regionController.getRegency
+  /*
+  #swagger.tags = ['Regions']
+  */
+);
+router.get(
+  "/regions/:id/district",
+  regionController.getDistrict
+  /*
+  #swagger.tags = ['Regions']
+  */
+);
+router.get(
+  "/regions/:id/village",
+  regionController.getVillage
+  /*
+  #swagger.tags = ['Regions']
+  */
+);
+router.get(
+  "/regions-search",
+  regionController.findByCity
+  /*
+  #swagger.tags = ['Regions']
+  */
+);
+
+router.post(
+  "/event",
+  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+  eventController.create
+  /*
+  #swagger.tags = ['Events']
+  #swagger.security = [{
+    "baererAuth": {}
+  }]
+  #swagger.requestBody = {
+    required: true,
+    schema: {
+      $ref: "#/components/schemas/CreateEventRequest"
+    }
+  }
+  */
+);
+router.get(
+  "/event",
+  eventController.findAll
+  /*
+  #swagger.tags = ['Events']
+  */
+);
+router.get(
+  "/event/:id",
+  eventController.findOne
+  /*
+  #swagger.tags = ['Events']
+  */
+);
+router.put(
+  "/event/:id",
+  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+  eventController.update
+  /*
+  #swagger.tags = ['Events']
+  #swagger.security = [{
+    "baererAuth": {}
+  }]
+  #swagger.requestBody = {
+    required: true,
+    schema: {
+      $ref: "#/components/schemas/CreateEventRequest"
+    }
+  }
+  */
+);
+router.delete(
+  "/event/:id",
+  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
+  eventController.remove
+  /*
+  #swagger.tags = ['Events']
+  #swagger.security = [{
+    "baererAuth": {}
+  }]
+  */
+);
+router.get(
+  "/event/:slug/slug",
+  eventController.findOneBySlug
+  /*
+  #swagger.tags = ['Events']
+  */
+);
+
+router.post(
   "/media/upload-single",
   [
     authMiddleware,
@@ -27,12 +197,12 @@ router.post(
   /*
   #swagger.tags = ['Media']
   #swagger.security = [{
-    "bearerAuth": {}
+    "baererAuth": {}
   }]
   #swagger.requestBody = {
     required: true,
     content: {
-      "multiple/form-data":{
+      "multipart/form-data": {
         schema: {
           type: "object",
           properties: {
@@ -55,21 +225,24 @@ router.post(
     mediaMiddleware.multiple("files"),
   ],
   mediaController.multiple
-   /*
+  /*
   #swagger.tags = ['Media']
   #swagger.security = [{
-    "bearerAuth": {}
+    "baererAuth": []
   }]
   #swagger.requestBody = {
     required: true,
     content: {
-      "multiple/form-data":{
+      "multipart/form-data": {
         schema: {
           type: "object",
           properties: {
             files: {
-              type: "string",
-              format: "binary"
+              type: "array",
+              items: {
+                type: "string",
+                format: "binary"
+              }
             }
           }
         }
@@ -85,7 +258,7 @@ router.delete(
   /*
   #swagger.tags = ['Media']
   #swagger.security = [{
-    "bearerAuth": {}
+    "baererAuth": {}
   }]
   #swagger.requestBody = {
     required: true,
@@ -93,154 +266,6 @@ router.delete(
       $ref: "#/components/schemas/RemoveMediaRequest"
     }
   }
-  */
-);
-
-router.post(
-  "/category",
-  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
-  categoryController.create
-  /*
-  #swagger.tags = ['Category']
-  #swagger.security = [{
-    "bearerAuth": {}
-  }]
-  #swagger.requestBody = {
-    required: true,
-    schema: {
-      $ref: "#/components/schemas/CreateCategoryRequest"
-    }
-  }
-  */
-);
-router.get("/category", categoryController.findAll
-  /*
-  #swagger.tags = ['Category']
-  */
-);
-router.get("/category/:id", categoryController.findOne
-  /*
-  #swagger.tags = ['Category']
-  */
-);
-router.put(
-  "/category/:id",
-  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
-  categoryController.update
-  /*
-  #swagger.tags = ['Category']
-  #swagger.security = [{
-    "bearerAuth": {}
-  }]
-  #swagger.requestBody = {
-    required: true,
-    schema: {
-      $ref: "#/components/schemas/CreateCategoryRequest"
-    }
-  }
-  */
-);
-router.delete(
-  "/category/:id",
-  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
-  categoryController.remove
-  /*
-  #swagger.tags = ['Category']
-  #swagger.security = [{
-    "bearerAuth": {}
-  }]
-  */
-);
-
-router.get("/regions", regionController.getAllProvinces
-  /*
-  #swagger.tags = ['Regions']
-  */
-);
-router.get("/regions/:id/province", regionController.getProvince
-  /*
-  #swagger.tags = ['Regions']
-  */
-);
-router.get("/regions/:id/regency", regionController.getRegency
-  /*
-  #swagger.tags = ['Regions']
-  */
-);
-router.get("/regions/:id/district", regionController.getDistrict
-  /*
-  #swagger.tags = ['Regions']
-  */
-);
-router.get("/regions/:id/village", regionController.getVillage
-  /*
-  #swagger.tags = ['Regions']
-  */
-);
-router.get("/regions-search", regionController.findByCity
-  /*
-  #swagger.tags = ['Regions']
-  */
-);
-
-router.post(
-  "/event",
-  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
-  eventController.create
-  /*
-  #swagger.tags = ['Events']
-  #swagger.security = [{
-    "bearerAuth": {}
-  }]
-  #swagger.requestBody = {
-    required: true,
-    schema: {
-      $ref: "#/components/schemas/CreateEventRequest"
-    }
-  }
-  */
-);
-router.get("/event", eventController.findAll
-  /*
-  #swagger.tags = ['Events']
-  */
-);
-router.get("/event/:id", eventController.findOne
-  /*
-  #swagger.tags = ['Events']
-  */
-);
-router.put(
-  "/event/:id",
-  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
-  eventController.update
-  /*
-  #swagger.tags = ['Events']
-  #swagger.security = [{
-    "bearerAuth": {}
-  }]
-  #swagger.requestBody = {
-    required: true,
-    schema: {
-      $ref: "#/components/schemas/CreateEventRequest"
-    }
-  }
-  */
-);
-router.delete(
-  "/event/:id",
-  [authMiddleware, aclMiddleware([ROLES.ADMIN])],
-  eventController.remove
-  /*
-  #swagger.tags = ['Events']
-  #swagger.security = [{
-    "bearerAuth": {}
-  }]
-  */
-);
-router.get("/event/:slug/slug", eventController.findOneBySlug
-  /*
-  #swagger.tags = ['Events']
   */
 );
 
