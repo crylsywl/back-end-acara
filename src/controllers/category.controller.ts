@@ -39,7 +39,7 @@ export default {
       const result = await CategoryModel.find(query)
         .limit(limit)
         .skip((page - 1) * limit)
-        .sort({ createAt: -1 })
+        .sort({ createAt: -1, _id: -1})
         .exec();
 
       const count = await CategoryModel.countDocuments(query);

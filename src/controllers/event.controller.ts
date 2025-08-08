@@ -36,7 +36,7 @@ export default {
       const result = await EventModel.find(query)
         .limit(limit)
         .skip((page - 1) * limit)
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1, _id: -1 })
         .exec();
 
       const count = await EventModel.countDocuments(query);
